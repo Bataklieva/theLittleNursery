@@ -1,0 +1,40 @@
+name: the_little_nursery
+description: >
+  Parent portal mobile app for The Little Nursery — an art studio and
+  socialization center for babies and children in Sofia, Bulgaria.
+publish_to: "none"
+version: 0.1.0
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # State management
+  provider: ^6.1.2
+
+  # Firebase (auth, data, push notifications)
+  firebase_core: ^2.32.0
+  firebase_auth: ^4.20.0
+  cloud_firestore: ^4.17.5
+  firebase_messaging: ^14.9.4
+
+  # Calendar UI for the workshop schedule
+  table_calendar: ^3.1.2
+
+  # Tap-to-call / tap-to-email on the locations screen
+  url_launcher: ^6.3.0
+
+  # Formatting dates/times in Bulgarian & English
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
