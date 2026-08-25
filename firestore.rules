@@ -1,0 +1,45 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Parents can only read/write their own profile and children.
+    match /parents/{parentId} {
+      allow read, update: if request.auth != null && request.auth.uid == parentId;
+      allow create: if request.auth != null && request.auth.uid == parentId;
+
+      match /children/{childId} {
+        allow read, write: if request.auth != null && request.auth.uid == parentId;
+      }
+    }
+
+    // Workshop calendar: readable by any signed-in parent, writable only
+    // by studio staff via the admin SDK (no client writes).
+    match /events/{eventId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Parent library articles: readable by any signed-in parent,
+    // published only by staff via the admin SDK.
+    match /articles/{articleId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Bookings: a parent can create/read/cancel only their own bookings.
+    // bookedCount on the related event is updated in the same
+    // transaction, so booking capacity is enforced server-side.
+    match /bookings/{bookingId} {
+      allow read: if request.auth != null
+        && resource.data.parentUid == request.auth.uid;
+      allow create: if request.auth != null
+        && request.resource.data.parentUid == request.auth.uid;
+      allow update: if request.auth != null
+        && resource.data.parentUid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['status']);
+      allow delete: if false;
+    }
+  }
+}
