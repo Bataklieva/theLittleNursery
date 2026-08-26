@@ -3,6 +3,20 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Studio staff who can create/edit workshops and library articles.
+    // Membership is just a document's existence — created by hand in the
+    // Firebase console (or an admin script), never by a client. See
+    // SETUP.md for how to make an account an admin.
+    function isAdmin() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    match /admins/{adminId} {
+      allow read: if request.auth != null && request.auth.uid == adminId;
+      allow write: if false;
+    }
+
     // Parents can only read/write their own profile and children.
     match /parents/{parentId} {
       allow read, update: if request.auth != null && request.auth.uid == parentId;
@@ -13,18 +27,24 @@ service cloud.firestore {
       }
     }
 
-    // Workshop calendar: readable by any signed-in parent, writable only
-    // by studio staff via the admin SDK (no client writes).
+    // Workshop calendar: readable by any signed-in parent. Admins can
+    // create/edit/delete workshops; any signed-in parent may additionally
+    // update just `bookedCount`, which is how BookingService reserves and
+    // releases a spot inside its transaction.
     match /events/{eventId} {
       allow read: if request.auth != null;
-      allow write: if false;
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin()
+        || (request.auth != null
+            && request.resource.data.diff(resource.data).affectedKeys()
+                 .hasOnly(['bookedCount']));
     }
 
     // Parent library articles: readable by any signed-in parent,
-    // published only by staff via the admin SDK.
+    // writable only by admins.
     match /articles/{articleId} {
       allow read: if request.auth != null;
-      allow write: if false;
+      allow write: if isAdmin();
     }
 
     // Bookings: a parent can create/read/cancel only their own bookings.

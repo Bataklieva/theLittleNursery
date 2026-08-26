@@ -20,11 +20,18 @@ class AuthService extends ChangeNotifier {
   User? _user;
   ParentProfile? _profile;
   List<Child> _children = const [];
+  bool _isAdmin = false;
 
   User? get user => _user;
   ParentProfile? get profile => _profile;
   List<Child> get children => _children;
   bool get isSignedIn => _user != null;
+
+  /// Whether the signed-in parent can create/edit workshops and library
+  /// articles. Backed by the existence of an `admins/{uid}` document,
+  /// which only the Firebase console (or an admin script) can create —
+  /// see SETUP.md.
+  bool get isAdmin => _isAdmin;
 
   CollectionReference<Map<String, dynamic>> get _parents =>
       _firestore.collection('parents');
@@ -34,6 +41,7 @@ class AuthService extends ChangeNotifier {
     if (user == null) {
       _profile = null;
       _children = const [];
+      _isAdmin = false;
       notifyListeners();
       return;
     }
@@ -50,6 +58,10 @@ class AuthService extends ChangeNotifier {
         .map((d) => Child.fromMap(d.id, d.data()))
         .toList()
       ..sort((a, b) => a.birthDate.compareTo(b.birthDate));
+
+    final adminDoc = await _firestore.collection('admins').doc(uid).get();
+    _isAdmin = adminDoc.exists;
+
     notifyListeners();
   }
 

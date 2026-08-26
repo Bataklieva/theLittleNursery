@@ -24,4 +24,18 @@ class ArticleService {
     if (!doc.exists) return null;
     return Article.fromMap(doc.id, doc.data()!);
   }
+
+  Future<void> createArticle(Article article) {
+    return _firestore.collection('articles').add(article.toMap());
+  }
+
+  Future<void> updateArticle(Article article) {
+    return _firestore.collection('articles').doc(article.id).update(
+          article.toMap(),
+        );
+  }
+
+  Future<void> deleteArticle(String articleId) {
+    return _firestore.collection('articles').doc(articleId).delete();
+  }
 }
