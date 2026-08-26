@@ -6,6 +6,8 @@ import '../../models/workshop_event.dart';
 import '../../services/auth_service.dart';
 import '../../services/event_service.dart';
 import '../calendar/event_detail_screen.dart';
+import '../locations/locations_screen.dart';
+import '../store/store_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -56,6 +58,30 @@ class HomeScreen extends StatelessWidget {
                 ],
               );
             },
+          ),
+          const SizedBox(height: 24),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.storefront_outlined),
+              title: const Text('Shop & premium membership'),
+              subtitle: const Text('Studio merch and premium perks'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const StoreScreen()),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.place_outlined),
+              title: const Text('Visit us'),
+              subtitle: const Text('Our two Sofia locations'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const LocationsScreen()),
+              ),
+            ),
           ),
         ],
       ),

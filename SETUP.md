@@ -70,4 +70,7 @@ flutter run
 ```
 
 See `README.md` for the Firestore schema and security rules this app
-expects once `flutterfire configure` has created a real Firebase project.
+expects once `flutterfire configure` has created a real Firebase project,
+and its "Store & payments (Stripe)" section for setting up the Cloud
+Functions that power checkout — the Node install from step 5 above is
+also what `cd functions && npm install` needs.

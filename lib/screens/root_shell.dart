@@ -6,12 +6,14 @@ import 'admin/admin_home_screen.dart';
 import 'calendar/calendar_screen.dart';
 import 'home/home_screen.dart';
 import 'library/library_screen.dart';
-import 'locations/locations_screen.dart';
 import 'profile/profile_screen.dart';
+import 'store/store_screen.dart';
 
 /// Bottom-navigation shell for the top-level parent-facing sections, plus
 /// a sixth "Admin" tab that only appears for accounts with editing rights
-/// (see AuthService.isAdmin).
+/// (see AuthService.isAdmin). Locations moved out of the bottom nav to
+/// make room for the Store tab — it's reachable from a card on Home and
+/// from Profile instead, since it's checked far less often than those.
 class RootShell extends StatefulWidget {
   const RootShell({super.key});
 
@@ -25,8 +27,8 @@ class _RootShellState extends State<RootShell> {
   static const _parentScreens = [
     HomeScreen(),
     CalendarScreen(),
+    StoreScreen(),
     LibraryScreen(),
-    LocationsScreen(),
     ProfileScreen(),
   ];
 
@@ -42,14 +44,14 @@ class _RootShellState extends State<RootShell> {
       label: 'Calendar',
     ),
     BottomNavigationBarItem(
+      icon: Icon(Icons.storefront_outlined),
+      activeIcon: Icon(Icons.storefront),
+      label: 'Store',
+    ),
+    BottomNavigationBarItem(
       icon: Icon(Icons.menu_book_outlined),
       activeIcon: Icon(Icons.menu_book),
       label: 'Library',
-    ),
-    BottomNavigationBarItem(
-      icon: Icon(Icons.place_outlined),
-      activeIcon: Icon(Icons.place),
-      label: 'Locations',
     ),
     BottomNavigationBarItem(
       icon: Icon(Icons.person_outline),

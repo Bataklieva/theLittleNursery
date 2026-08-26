@@ -6,7 +6,9 @@ import '../../models/booking.dart';
 import '../../models/child.dart';
 import '../../services/auth_service.dart';
 import '../../services/booking_service.dart';
+import '../locations/locations_screen.dart';
 import 'child_form_screen.dart';
+import 'orders_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -34,6 +36,44 @@ class ProfileScreen extends StatelessWidget {
             Text(profile.name, style: Theme.of(context).textTheme.titleLarge),
             Text(profile.email, style: Theme.of(context).textTheme.bodyMedium),
             if (profile.phone != null) Text(profile.phone!),
+            const SizedBox(height: 12),
+            if (profile.isPremiumMember)
+              Chip(
+                avatar: const Icon(Icons.star, size: 16, color: Colors.white),
+                label: Text(
+                  'Premium member · until '
+                  '${DateFormat('d MMM yyyy').format(profile.membershipExpiresAt!)}',
+                ),
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                labelStyle: const TextStyle(color: Colors.white),
+              )
+            else
+              const Chip(label: Text('Not a premium member yet')),
+            const SizedBox(height: 12),
+            Card(
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.receipt_long_outlined),
+                    title: const Text('My orders'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const OrdersScreen()),
+                    ),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.place_outlined),
+                    title: const Text('Our locations'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const LocationsScreen(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             const SizedBox(height: 24),
           ],
           Row(

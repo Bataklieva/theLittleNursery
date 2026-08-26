@@ -3,10 +3,11 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Studio staff who can create/edit workshops and library articles.
-    // Membership is just a document's existence — created by hand in the
-    // Firebase console (or an admin script), never by a client. See
-    // SETUP.md for how to make an account an admin.
+    // Studio staff who can create/edit workshops, library articles,
+    // products, and membership plans. Membership is just a document's
+    // existence — created by hand in the Firebase console (or an admin
+    // script), never by a client. See SETUP.md for how to make an
+    // account an admin.
     function isAdmin() {
       return request.auth != null &&
         exists(/databases/$(database)/documents/admins/$(request.auth.uid));
@@ -17,10 +18,18 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // Parents can only read/write their own profile and children.
+    // Parents can read/update their own profile, but only the fields the
+    // app itself ever writes — `membershipExpiresAt` is granted only by
+    // the stripeWebhook Cloud Function (via the Admin SDK, which bypasses
+    // these rules entirely), never by the client, so a parent can't just
+    // write themselves free premium access.
     match /parents/{parentId} {
-      allow read, update: if request.auth != null && request.auth.uid == parentId;
-      allow create: if request.auth != null && request.auth.uid == parentId;
+      allow read: if request.auth != null && request.auth.uid == parentId;
+      allow create: if request.auth != null && request.auth.uid == parentId
+        && !('membershipExpiresAt' in request.resource.data);
+      allow update: if request.auth != null && request.auth.uid == parentId
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['name', 'phone', 'fcmToken']);
 
       match /children/{childId} {
         allow read, write: if request.auth != null && request.auth.uid == parentId;
@@ -45,6 +54,38 @@ service cloud.firestore {
     match /articles/{articleId} {
       allow read: if request.auth != null;
       allow write: if isAdmin();
+    }
+
+    // Store catalog: readable by any signed-in parent (the shop screen
+    // filters to `active == true` client-side; admins also need to see
+    // hidden ones in the manage screens). Writable only by admins —
+    // prices are never client-settable.
+    match /products/{productId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    match /membershipPlans/{planId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // Orders: a parent can create their own order in `pendingPayment`
+    // status (checkout does nothing more than stage what they intend to
+    // buy) and read their own order history; admins can read/update all
+    // orders (fulfillment status). The pendingPayment → paid transition,
+    // stock decrement, and membership grant are done server-side by
+    // createPaymentIntent/stripeWebhook using the Admin SDK, which is
+    // also how the real charge amount is computed — never trusted from
+    // the client's cached totalCents. See functions/src/index.ts.
+    match /orders/{orderId} {
+      allow read: if request.auth != null
+        && (resource.data.parentUid == request.auth.uid || isAdmin());
+      allow create: if request.auth != null
+        && request.resource.data.parentUid == request.auth.uid
+        && request.resource.data.status == 'pendingPayment';
+      allow update: if isAdmin();
+      allow delete: if false;
     }
 
     // Bookings: a parent can create/read/cancel only their own bookings.

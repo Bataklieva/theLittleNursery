@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'manage_articles_screen.dart';
 import 'manage_events_screen.dart';
+import 'manage_membership_plans_screen.dart';
+import 'manage_orders_screen.dart';
+import 'manage_products_screen.dart';
 
 /// Landing screen for the "Admin" tab, only shown to signed-in parents
 /// whose account has an `admins/{uid}` document (see AuthService.isAdmin).
@@ -37,6 +40,46 @@ class AdminHomeScreen extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (_) => const ManageArticlesScreen(),
                 ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.storefront_outlined),
+              title: const Text('Manage products'),
+              subtitle: const Text('Add, edit, or remove store items'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const ManageProductsScreen(),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.star_outline),
+              title: const Text('Manage membership plans'),
+              subtitle: const Text('Edit premium membership pricing & perks'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const ManageMembershipPlansScreen(),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.receipt_long_outlined),
+              title: const Text('Orders'),
+              subtitle: const Text('Track and fulfill paid orders'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const ManageOrdersScreen()),
               ),
             ),
           ),
