@@ -43,4 +43,22 @@ class EventService {
     if (!doc.exists) return null;
     return WorkshopEvent.fromMap(doc.id, doc.data()!);
   }
+
+  /// All events regardless of date, soonest first — for the admin list.
+  Stream<List<WorkshopEvent>> watchAllForAdmin() {
+    return _events.orderBy('startTime').snapshots().map((snap) =>
+        snap.docs.map((d) => WorkshopEvent.fromMap(d.id, d.data())).toList());
+  }
+
+  Future<void> createEvent(WorkshopEvent event) {
+    return _events.add(event.toMap());
+  }
+
+  Future<void> updateEvent(WorkshopEvent event) {
+    return _events.doc(event.id).update(event.toMap());
+  }
+
+  Future<void> deleteEvent(String eventId) {
+    return _events.doc(eventId).delete();
+  }
 }

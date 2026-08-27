@@ -36,4 +36,36 @@ class WorkshopEvent {
       bookedCount: map['bookedCount'] as int? ?? 0,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'description': description,
+      'locationId': locationId,
+      'startTime': Timestamp.fromDate(startTime),
+      'endTime': Timestamp.fromDate(endTime),
+      'capacity': capacity,
+      'bookedCount': bookedCount,
+    };
+  }
+
+  WorkshopEvent copyWith({
+    String? title,
+    String? description,
+    String? locationId,
+    DateTime? startTime,
+    DateTime? endTime,
+    int? capacity,
+  }) {
+    return WorkshopEvent(
+      id: id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      locationId: locationId ?? this.locationId,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
+      capacity: capacity ?? this.capacity,
+      bookedCount: bookedCount,
+    );
+  }
 }

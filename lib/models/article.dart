@@ -29,4 +29,31 @@ class Article {
       publishedAt: (map['publishedAt'] as Timestamp).toDate(),
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'summary': summary,
+      'body': body,
+      'imageUrl': imageUrl,
+      'publishedAt': Timestamp.fromDate(publishedAt),
+    };
+  }
+
+  Article copyWith({
+    String? title,
+    String? summary,
+    String? body,
+    String? imageUrl,
+    DateTime? publishedAt,
+  }) {
+    return Article(
+      id: id,
+      title: title ?? this.title,
+      summary: summary ?? this.summary,
+      body: body ?? this.body,
+      imageUrl: imageUrl ?? this.imageUrl,
+      publishedAt: publishedAt ?? this.publishedAt,
+    );
+  }
 }
